@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/node.js">
+    <title>Login Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #0d0d0d;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .container {
+            background: linear-gradient(135deg, #0d0d0d, #6a0dad);
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px #6a0dad;
+            padding: 30px 40px;
+            width: 350px;
+            text-align: center;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #a366ff;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .input-field {
+            margin: 10px 0;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 5px;
+        }
+
+        button {
+            background-color: #6a0dad;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #8a2be2;
+        }
+
+        .links {
+            margin-top: 20px;
+        }
+
+        a {
+            color: #a366ff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .hacker-line {
+            position: absolute;
+            white-space: nowrap;
+            color: limegreen;
+            font-size: 12px;
+            animation: scroll 8s linear infinite;
+        }
+
+        .left {
+            left: 5%;
+        }
+
+        .right {
+            right: 5%;
+            color: cyan;
+        }
+
+        @keyframes scroll {
+            from {
+                transform: translateY(-100%);
+            }
+            to {
+                transform: translateY(100%);
+            }
+        }
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .category {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+            cursor: pointer;
+        }
+
+        .icon {
+            width: 80px;
+            height: 80px;
+            background-color: #6a0dad;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .icon.photo {
+            background-image: url('photo-icon.png');
+            background-size: cover;
+        }
+
+        .icon.video {
+            background-image: url('video-icon.png');
+            background-size: cover;
+        }
+
+        .icon.document {
+            background-image: url('document-icon.png');
+            background-size: cover;
+        }
+
+        /* Стили для анимации */
+        .swipe-animation {
+            animation: swipeIn 1s ease-out;
+        }
+
+        @keyframes swipeIn {
+            from {
+                transform: translateX(-100%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="background"></div>
+    <div class="container" id="loginContainer">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <div class="input-field">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+            </div>
+            <div class="input-field">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="links">
+            <a href="#" onclick="showRegisterForm()">Create an account</a>
+        </div>
+    </div>
+
+    <div class="container" id="registerContainer" style="display:none;">
+        <h1>Register</h1>
+        <form id="registerForm">
+            <div class="input-field">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" placeholder="Enter first name">
+            </div>
+            <div class="input-field">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" placeholder="Enter last name">
+            </div>
+            <div class="input-field">
+                <label for="birthYear">Year of Birth</label>
+                <input type="text" id="birthYear" placeholder="Enter year of birth">
+            </div>
+            <div class="input-field">
+                <label for="birthDate">Date of Birth</label>
+                <input type="date" id="birthDate">
+            </div>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <div class="container" id="dashboard" style="display:none;">
+        <h1>Dashboard</h1>
+        <div class="categories">
+            <div class="category">
+                <div class="icon photo"></div>
+                <span>Photos</span>
+            </div>
+            <div class="category">
+                <div class="icon video"></div>
+                <span>Videos</span>
+            </div>
+            <div class="category">
+                <div class="icon document"></div>
+                <span>Documents</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Переменные для работы с сервером
+        const background = document.getElementById("background");
+
+        // Функция для создания случайных строк
+        function createHackerLines() {
+            const japaneseChars = "゠-ヿ぀-ゟ一-龿";
+            const numbers = "0123456789";
+
+            function generateRandomString(chars) {
+                let str = "";
+                const length = Math.random() * 20 + 10;
+                for (let i = 0; i < length; i++) {
+                    str += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return str;
+            }
+
+            for (let i = 0; i < 100; i++) {
+                const lineLeft = document.createElement("div");
+                lineLeft.className = "hacker-line left";
+                lineLeft.style.top = Math.random() * 100 + "vh";
+                lineLeft.style.animationDuration = Math.random() * 3 + 3 + "s";
+                lineLeft.textContent = generateRandomString(japaneseChars);
+                background.appendChild(lineLeft);
+
+                const lineRight = document.createElement("div");
+                lineRight.className = "hacker-line right";
+                lineRight.style.top = Math.random() * 100 + "vh";
+                lineRight.style.animationDuration = Math.random() * 3 + 3 + "s";
+                lineRight.textContent = generateRandomString(numbers);
+                background.appendChild(lineRight);
+            }
+        }
+
+        createHackerLines();
+
+        function showRegisterForm() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('registerContainer').style.display = 'block';
+        }
+
+        function showDashboard() {
+            document.getElementById('registerContainer').style.display = 'none';
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            // Изменение фона
+            document.body.style.backgroundColor = "#1c1c1c";
+            
+            // Добавление анимации свайпа
+            document.getElementById('dashboard').classList.add('swipe-animation');
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const birthYear = document.getElementById('birthYear').value;
+            const birthDate = document.getElementById('birthDate').value;
+
+            fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ firstName, lastName, birthYear, birthDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Account created successfully!");
+                    showDashboard();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Logged in successfully!");
+                    showDashboard();
+                } else {
+                    alert("Error: " + data.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
